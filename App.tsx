@@ -1,7 +1,7 @@
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Security from './src/assets/images/svg/securityOn.svg';
-// import Security from './src/assets/images/svg/two_factor.svg';
+import HomeScreen from './src/screens/HomeScreen';
 
 import { ScaledSheet, moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { Button, SafeAreaView, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
@@ -14,14 +14,22 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name='Main' component={Main} options={{headerShown: false}}/>
-        <Stack.Screen name='HomeScreen' component={HomeScreen} />
+        <Stack.Screen
+          name='Main'
+          component={Main}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='HomeScreen'
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
-  ) 
+  )
 }
 
-const Main = ({navigation}: {navigation: any}) => {
+const Main = ({ navigation }: { navigation: any }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -40,18 +48,6 @@ const Main = ({navigation}: {navigation: any}) => {
   );
 }
 
-function HomeScreen({navigation}: {navigation: any}) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Main')}
-      />
-    </View>
-  );
-}
-
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
@@ -66,7 +62,7 @@ const styles = ScaledSheet.create({
     marginTop: '20@vs'
   },
   btn: {
-    backgroundColor: '#e90053',
+    backgroundColor: '#008b8b',
     padding: '15@vs',
     width: '90%',
     borderRadius: 5,
