@@ -21,7 +21,7 @@ const App = () => {
   ) 
 }
 
-const Main = ({ navigation }) => {
+const Main = ({navigation}: {navigation: any}) => {
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -40,7 +40,7 @@ const Main = ({ navigation }) => {
   );
 }
 
-function HomeScreen({ navigation }) {
+function HomeScreen({navigation}: {navigation: any}) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Home Screen</Text>
