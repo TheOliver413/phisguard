@@ -1,6 +1,6 @@
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Security from './src/assets/images/svg/securityOn.svg';
+import Security from './src/assets/images/svg/secutiry.svg';
 import HomeScreen from './src/screens/HomeScreen';
 
 import { ScaledSheet, moderateScale, scale, verticalScale } from "react-native-size-matters";
@@ -36,7 +36,7 @@ const Main = ({ navigation }: { navigation: any }) => {
         <Text style={styles.title}>PHISH GUARD</Text>
       </View>
       <View style={styles.container_img}>
-        <Security width={scale(250)} height={verticalScale(250)} />
+        <Security width={scale(300)} height={verticalScale(300)} />
       </View>
       <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('HomeScreen')}>
         <Text style={styles.btn_label}>
@@ -53,19 +53,19 @@ const styles = ScaledSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#111921',
   },
   title: {
     fontSize: '30@vs',
     fontWeight: 'bold',
-    color: '#2f2e41',
-    marginTop: '20@vs'
+    color: '#FFF',
+    marginTop: '20@vs',
   },
   btn: {
     backgroundColor: '#008b8b',
     padding: '15@vs',
     width: '90%',
-    borderRadius: 5,
+    borderRadius: '5@ms',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

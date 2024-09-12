@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import Feather from 'react-native-vector-icons/Feather';
 import Carousel from 'react-native-reanimated-carousel';
 import BannerSlider from "../components/BannerSlider";
+import CustomSwitch from "../components/CustomSwitch";
+import ListItem from "../components/ListItem";
 
 import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInput, TouchableOpacity } from "react-native";
 import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
-import { sliderData } from "../model/data";
-import { windowWidth } from "../utils/Dimensions";
+import { freeGames, paidGames, sliderData } from "../model/data";
+import { widthHeigth, windowWidth } from "../utils/Dimensions";
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
 
-    const renderBanner = ({item, index}) => {
+    const [tab, setTap] = useState('1')
+
+    const renderBanner = ({ item, index }) => {
         return (<BannerSlider data={item} index={index} />)
+    }
+
+    const onSelectSwitch = (value) => {
+        setTap(value);
     }
 
     return (
@@ -19,16 +27,18 @@ const HomeScreen = () => {
             <ScrollView style={styles.scrollView}>
                 <View style={styles.container_img}>
                     <Text style={styles.title}>Hello Oliver</Text>
-                    <ImageBackground
-                        source={require('../assets/images/user-profile.jpg')}
-                        style={styles.imageBackground}
-                        imageStyle={{ borderRadius: 30 }}
-                    />
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <ImageBackground
+                            source={require('../assets/images/user-profile.jpg')}
+                            style={styles.imageBackground}
+                            imageStyle={{ borderRadius: 30 }}
+                        />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.containerInput}>
                     <Feather name="search" size={verticalScale(15)} color={"#C6C6C6C6"} style={styles.search} />
-                    <TextInput placeholder="URL" style={styles.url} />
+                    <TextInput placeholder="URL" placeholderTextColor={'#FFF'} style={styles.url} />
                 </View>
 
                 <View style={styles.titleSection}>
@@ -42,11 +52,49 @@ const HomeScreen = () => {
                     loop
                     scrollAnimationDuration={1000}
                     autoPlay={true}
+                    autoPlayInterval={5000}
                     data={sliderData}
                     renderItem={renderBanner}
                     width={windowWidth - 60}
-                    height={windowWidth / 2}
+                    height={widthHeigth / 4}
                 />
+
+                <View style={styles.switch}>
+                    <CustomSwitch
+                        selectionMode={1}
+                        option1={'Tap 1'}
+                        option2={'Tap 2'}
+                        onSelectSwitch={onSelectSwitch}
+                    />
+                </View>
+
+                <View style={styles.tabs}>
+                    {tab == 1 &&
+                        freeGames.map(item => (
+                            <ListItem
+                                key={item.id}
+                                photo={item.poster}
+                                title={item.title}
+                                subtitle={item.subtitle}
+                                isFree={item.isFree}
+                                price={item.price}
+                            />
+                        ))
+                    }
+
+                    {tab == 2 &&
+                        paidGames.map(item => (
+                            <ListItem
+                                key={item.id}
+                                photo={item.poster}
+                                title={item.title}
+                                subtitle={item.subtitle}
+                                isFree={item.isFree}
+                                price={item.price}
+                            />
+                        ))
+                    }
+                </View>
             </ScrollView>
         </SafeAreaView>
     )
@@ -55,7 +103,7 @@ const HomeScreen = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF'
+        backgroundColor: '#111921'
     },
     scrollView: {
         padding: '20@vs'
@@ -68,7 +116,7 @@ const styles = ScaledSheet.create({
     title: {
         fontSize: '15@vs',
         fontFamily: 'Roboto-Medium',
-        color: '#000'
+        color: '#FFF'
     },
     imageBackground: {
         width: '30@s',
@@ -80,14 +128,14 @@ const styles = ScaledSheet.create({
         borderWidth: '1@s',
         borderRadius: 8,
         paddingHorizontal: '10@s',
-        paddingVertical: '5@vs',
         alignItems: 'center'
     },
     search: {
         marginRight: '5@s'
     },
     url: {
-        fontSize: '12@vs'
+        fontSize: '12@vs',
+        color: '#FFF'
     },
     titleSection: {
         marginVertical: '10@vs',
@@ -97,6 +145,12 @@ const styles = ScaledSheet.create({
     span: {
         color: '#008b8b',
         fontSize: '15@vs'
+    },
+    switch: {
+        marginVertical: '10@vs'
+    },
+    tabs: {
+        marginBottom: '10@vs'
     }
 });
 

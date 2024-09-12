@@ -104,7 +104,7 @@ export const sliderData = [
       poster: require('../assets/images/diablo-4.jpeg'),
       title: 'Diablo 4',
       subtitle: 'Blizzard Entertainment',
-      isFree: 'No',
+      isFree: 'Yes',
       id: '6',
     },
   ];
