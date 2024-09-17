@@ -38,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
 
                 <View style={styles.containerInput}>
                     <Feather name="search" size={verticalScale(15)} color={"#C6C6C6C6"} style={styles.search} />
-                    <TextInput placeholder="URL" placeholderTextColor={'#FFF'} style={styles.url} />
+                    <TextInput placeholder="URL" placeholderTextColor={'#000'} style={styles.url} />
                 </View>
 
                 <View style={styles.titleSection}>
@@ -103,7 +103,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#111921'
+        backgroundColor: '#FFF'
     },
     scrollView: {
         padding: '20@vs'
@@ -116,7 +116,7 @@ const styles = ScaledSheet.create({
     title: {
         fontSize: '15@vs',
         fontFamily: 'Roboto-Medium',
-        color: '#FFF'
+        color: '#000'
     },
     imageBackground: {
         width: '30@s',
@@ -135,7 +135,7 @@ const styles = ScaledSheet.create({
     },
     url: {
         fontSize: '12@vs',
-        color: '#FFF'
+        color: '#000'
     },
     titleSection: {
         marginVertical: '10@vs',

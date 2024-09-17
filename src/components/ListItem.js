@@ -56,13 +56,13 @@ const styles = ScaledSheet.create({
         width: '75%'
     },
     itemName: {
-        color: '#FFF',
+        color: '#000',
         fontFamily: 'Roboto-Medium',
         fontSize: '12@vs',
         textTransform: 'uppercase'
     },
     subtitle: {
-        color: '#FFF',
+        color: '#000',
         fontFamily: 'Roboto-Medium',
         fontSize: '10@vs',
     },

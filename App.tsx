@@ -53,7 +53,7 @@ const styles = ScaledSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#111921',
+    backgroundColor: '#FFF',
   },
   title: {
     fontSize: '30@vs',
