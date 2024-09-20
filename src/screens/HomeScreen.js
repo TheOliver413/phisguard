@@ -27,7 +27,7 @@ const HomeScreen = ({ navigation }) => {
             <ScrollView style={styles.scrollView}>
                 <View style={styles.container_img}>
                     <Text style={styles.title}>Hello Oliver</Text>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={() => navigation.openDrawer()}>
                         <ImageBackground
                             source={require('../assets/images/user-profile.jpg')}
                             style={styles.imageBackground}
