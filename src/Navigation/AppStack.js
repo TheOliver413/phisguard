@@ -1,5 +1,5 @@
-import React from 'react'
-import HomeScreen from '../screens/HomeScreen';
+import React from 'react';
+
 import MomentsScreen from '../screens/MomentsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CustomDrawer from '../components/CustomDrawer';
@@ -10,6 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
+import TabNavigator from './TabNavigator';
 const Drawer = createDrawerNavigator();
 
 const AppStack = () => {
@@ -25,7 +26,7 @@ const AppStack = () => {
             }}>
             <Drawer.Screen
                 name='Home'
-                component={HomeScreen}
+                component={TabNavigator}
                 options={{
                     drawerIcon: ({ color }) => (
                         <Ionicons name='home-outline' size={verticalScale(15)} color={color} />

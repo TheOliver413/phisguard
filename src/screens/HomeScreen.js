@@ -78,6 +78,12 @@ const HomeScreen = ({ navigation }) => {
                                 subtitle={item.subtitle}
                                 isFree={item.isFree}
                                 price={item.price}
+                                onPress={() =>
+                                    navigation.navigate('DetailsScreen', {
+                                        title: item.title,
+                                        id: item.id
+                                    })
+                                }
                             />
                         ))
                     }
@@ -91,6 +97,12 @@ const HomeScreen = ({ navigation }) => {
                                 subtitle={item.subtitle}
                                 isFree={item.isFree}
                                 price={item.price}
+                                onPress={() =>
+                                    navigation.navigate('DetailsScreen', {
+                                        title: item.title,
+                                        id: item.id
+                                    })
+                                }
                             />
                         ))
                     }

@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View, Image } from 'react-native'
 import { scale, verticalScale, ScaledSheet } from 'react-native-size-matters'
 import { windowWidth } from '../utils/Dimensions';
 
-export default function ListItem({ photo, title, subtitle, isFree, price }) {
+export default function ListItem({ photo, title, subtitle, isFree, price, onPress }) {
     return (
         <View style={styles.container}>
             <View style={styles.list}>
@@ -24,7 +24,7 @@ export default function ListItem({ photo, title, subtitle, isFree, price }) {
                 </View>
             </View>
 
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity onPress={onPress} style={styles.btn}>
                 <Text style={styles.btnText}>
                     {isFree === 'Yes' ? 'Play' : price}
                 </Text>
