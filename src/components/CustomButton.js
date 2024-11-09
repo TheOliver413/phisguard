@@ -1,12 +1,25 @@
-import React from 'react'
-import { View, Text } from 'react-native'
+import {Text, TouchableOpacity} from 'react-native';
+import React from 'react';
 
-const CartScreen = () => {
+export default function CustomButton({label, onPress}) {
   return (
-    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-      <Text>Cart Screen</Text>
-    </View>
-  )
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        backgroundColor: '#018b8b',
+        padding: 20,
+        borderRadius: 10,
+        marginBottom: 30,
+      }}>
+      <Text
+        style={{
+          textAlign: 'center',
+          fontWeight: '700',
+          fontSize: 16,
+          color: '#fff',
+        }}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
 }
-
-export default CartScreen

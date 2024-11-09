@@ -1,12 +1,15 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
 import { View, Text, ImageBackground, Image, TouchableOpacity } from 'react-native'
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { ScaledSheet, moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { AuthContext } from '../context/AuthContext';
 
 const CustomDrawer = (props) => {
+    const { logout } = useContext(AuthContext);
+
     return (
         <View style={styles.container}>
             <DrawerContentScrollView {...props} contentContainerStyle={styles.ContentScrollView}>
@@ -19,13 +22,13 @@ const CustomDrawer = (props) => {
                 </View>
             </DrawerContentScrollView>
             <View style={styles.footer}>
-                <TouchableOpacity onPress={() => { }} style={styles.btn}>
+                <TouchableOpacity onPress={() => {logout()}} style={styles.btn}>
                     <View style={styles.btnContainer}>
                         <Ionicons name='share-social-outline' size={verticalScale(15)} color={'#333'}/>
                         <Text style={styles.text}>Our Custom Text</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { }} style={styles.btn}>
+                <TouchableOpacity onPress={() => {logout()}} style={styles.btn}>
                     <View style={styles.btnContainer}>
                         <Ionicons name='exit-outline' size={verticalScale(15)} color={'#333'}/>
                         <Text style={styles.text}>Sing Out</Text>
