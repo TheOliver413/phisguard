@@ -9,7 +9,7 @@ export const sliderData = [
     },
     {
         title: 'Navegación Segura',
-        image: require('../assets/images/homescreen/game-3.png'),
+        image: require('../assets/images/homescreen/game-3..jpeg'),
     },
 ];
 
