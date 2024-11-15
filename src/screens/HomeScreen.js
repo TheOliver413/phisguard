@@ -18,13 +18,13 @@ const HomeScreen = ({ navigation }) => {
     const [tab, setTap] = useState('1')
     const [analysisResult, setAnalysisResult] = useState(null);
     const { userInfo, isLoading } = useContext(AuthContext);
-    
+
     const validateUrl = async () => {
         if (!url) {
             Alert.alert('Error', 'Por favor ingresa una URL');
             return;
         }
-        
+
         try {
             const email = userInfo.user.email;
             const response = await axios.post(`${BASE_URL}/validate_url`, { url, email });
@@ -126,9 +126,13 @@ const HomeScreen = ({ navigation }) => {
                         <Text style={styles.resultText}>IP: {analysisResult.ip}</Text>
                         <Text style={styles.resultText}>Mensaje de Phishing: {analysisResult.phishingMessage}</Text>
                         <Text style={styles.resultText}>Reputación: {analysisResult.reputationResult}</Text>
-                        <View style={styles.buttonContainer}>
-                            <Button title="Enviar Correo" onPress={sendEmail} />
-                            <Button title="Cerrar Reporte" onPress={handleClear} />
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
+                            <TouchableOpacity style={styles.analyzeButton} onPress={sendEmail}>
+                                <Text style={styles.buttonText}>Enviar Correo</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.analyzeButton} onPress={handleClear}>
+                                <Text style={styles.buttonText}>Cerrar Reporte</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 )}
@@ -279,7 +283,12 @@ const styles = ScaledSheet.create({
     resultText: {
         color: '#000',
         fontSize: '14@vs'
-    }
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: '10@vs'
+    },
 });
 
 export default HomeScreen;
