@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Feather from 'react-native-vector-icons/Feather';
 import Carousel from 'react-native-reanimated-carousel';
 import BannerSlider from "../components/BannerSlider";
@@ -9,10 +9,12 @@ import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInpu
 import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
 import { freeGames, paidGames, sliderData } from "../model/data";
 import { widthHeigth, windowWidth } from "../utils/Dimensions";
+import { AuthContext } from "../context/AuthContext";
 
 const HomeScreen = ({ navigation }) => {
 
     const [tab, setTap] = useState('1')
+    const { userInfo } = useContext(AuthContext);
 
     const renderBanner = ({ item, index }) => {
         return (<BannerSlider data={item} index={index} />)
@@ -26,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
                 <View style={styles.container_img}>
-                    <Text style={styles.title}>Hello Oliver</Text>
+                    <Text style={styles.title}>Hello {userInfo.user.username}</Text>
                     <TouchableOpacity onPress={() => navigation.openDrawer()}>
                         <ImageBackground
                             source={require('../assets/images/user-profile.jpg')}
