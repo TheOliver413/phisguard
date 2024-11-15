@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React, { useContext, } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
@@ -9,29 +9,34 @@ import { AuthContext } from '../context/AuthContext';
 
 const CustomDrawer = (props) => {
     const { logout } = useContext(AuthContext);
+    const { userInfo, isLoading } = useContext(AuthContext);
 
     return (
         <View style={styles.container}>
             <DrawerContentScrollView {...props} contentContainerStyle={styles.ContentScrollView}>
                 <ImageBackground source={require('../assets/images/menu_bg.jpg')} style={styles.ImageBackground}>
                     <Image source={require('../assets/images/user-profile.jpg')} style={styles.userImage} />
-                    <Text style={styles.name}>Oliver Borda</Text>
+                    <Text style={styles.name}>
+                        {userInfo && userInfo.user && userInfo.user.username
+                            ? `${userInfo.user.username}`
+                            : 'Usuario'}
+                    </Text>
                 </ImageBackground>
                 <View style={styles.itemList}>
                     <DrawerItemList {...props} />
                 </View>
             </DrawerContentScrollView>
             <View style={styles.footer}>
-                <TouchableOpacity onPress={() => {logout()}} style={styles.btn}>
+                <TouchableOpacity onPress={() => { logout() }} style={styles.btn}>
                     <View style={styles.btnContainer}>
-                        <Ionicons name='share-social-outline' size={verticalScale(15)} color={'#333'}/>
-                        <Text style={styles.text}>Our Custom Text</Text>
+                        <Ionicons name='share-social-outline' size={verticalScale(15)} color={'#333'} />
+                        <Text style={styles.text}>Próximamente</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {logout()}} style={styles.btn}>
+                <TouchableOpacity onPress={() => { logout() }} style={styles.btn}>
                     <View style={styles.btnContainer}>
-                        <Ionicons name='exit-outline' size={verticalScale(15)} color={'#333'}/>
-                        <Text style={styles.text}>Sing Out</Text>
+                        <Ionicons name='exit-outline' size={verticalScale(15)} color={'#333'} />
+                        <Text style={styles.text}>Finalizar la sesión</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -50,7 +55,7 @@ const styles = ScaledSheet.create({
         padding: '10@vs'
     },
     userImage: {
-        height: '50@vs',
+        height: '40@vs',
         width: '40@s',
         borderRadius: 50,
         marginBottom: '5@vs'

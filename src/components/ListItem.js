@@ -26,7 +26,7 @@ export default function ListItem({ photo, title, subtitle, isFree, price, onPres
 
             <TouchableOpacity onPress={onPress} style={styles.btn}>
                 <Text style={styles.btnText}>
-                    {isFree === 'Yes' ? 'Play' : price}
+                    {isFree === 'Yes' ? 'Ver' : price}
                 </Text>
             </TouchableOpacity>
         </View>
