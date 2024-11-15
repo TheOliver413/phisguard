@@ -16,7 +16,7 @@ const OnBoardingScreen = ({navigation}) => {
             </View>
             <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Login')}>
                 <Text style={styles.btn_label}>
-                    Let's begin
+                    Phishing Guard
                 </Text>
                 <MaterialIcons name="arrow-forward-ios" size={20} color="#FFF" />
             </TouchableOpacity>

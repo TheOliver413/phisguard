@@ -6,6 +6,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    Alert,
 } from 'react-native';
 
 import DatePicker from 'react-native-date-picker';
@@ -20,17 +21,48 @@ import GoogleSVG from '../assets/images/misc/google.svg';
 import FacebookSVG from '../assets/images/misc/facebook.svg';
 import TwitterSVG from '../assets/images/misc/twitter.svg';
 import CustomButton from '../components/CustomButton';
+import { BASE_URL } from '../../config';
+import axios from 'axios';
 
 const RegisterScreen = ({ navigation }) => {
-    const [date, setDate] = useState(new Date());
-    const [open, setOpen] = useState(false);
-    const [dobLabel, setDobLabel] = useState('Date of Birth');
+    const [userName, setUserName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleRegister = () => {
+
+        if (!userName || !email || !password) {
+            Alert.alert('Error', 'Por favor llena todos los campos');
+            return;
+        }
+
+        const registrationData = {
+            username: userName,
+            email: email,
+            password: password,
+            role: 'user'
+        };
+
+        axios.post(`${BASE_URL}/register`, registrationData)
+            .then(response => {
+                // Verificar si el registro fue exitoso
+                if (response.data.msg === "Usuario registrado exitosamente") {
+                    Alert.alert('Éxito', response.data.msg); // Mostrar el mensaje exitoso
+                    navigation.goBack(); // Regresar a la pantalla de login
+                } else {
+                    // En caso de que no sea exitoso
+                    Alert.alert('Error', 'Registro fallido');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                Alert.alert('Error', 'Algo salió mal. Por favor inténtalo de nuevo.');
+            });
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={{ paddingHorizontal: 25 }}>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: 25 }}>
                 <View style={{ alignItems: 'center' }}>
                     <RegistrationSVG
                         height={300}
@@ -46,7 +78,8 @@ const RegisterScreen = ({ navigation }) => {
                         fontWeight: '500',
                         color: '#333',
                         marginBottom: 30,
-                    }}>
+                    }}
+                >
                     Register
                 </Text>
 
@@ -55,7 +88,8 @@ const RegisterScreen = ({ navigation }) => {
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         marginBottom: 30,
-                    }}>
+                    }}
+                >
                     <TouchableOpacity
                         onPress={() => { }}
                         style={{
@@ -64,7 +98,8 @@ const RegisterScreen = ({ navigation }) => {
                             borderRadius: 10,
                             paddingHorizontal: 30,
                             paddingVertical: 10,
-                        }}>
+                        }}
+                    >
                         <GoogleSVG height={24} width={24} />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -75,7 +110,8 @@ const RegisterScreen = ({ navigation }) => {
                             borderRadius: 10,
                             paddingHorizontal: 30,
                             paddingVertical: 10,
-                        }}>
+                        }}
+                    >
                         <FacebookSVG height={24} width={24} />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -86,7 +122,8 @@ const RegisterScreen = ({ navigation }) => {
                             borderRadius: 10,
                             paddingHorizontal: 30,
                             paddingVertical: 10,
-                        }}>
+                        }}
+                    >
                         <TwitterSVG height={24} width={24} />
                     </TouchableOpacity>
                 </View>
@@ -97,6 +134,8 @@ const RegisterScreen = ({ navigation }) => {
 
                 <InputField
                     label={'User Name'}
+                    value={userName}
+                    onChangeText={text => setUserName(text)}
                     icon={
                         <Ionicons
                             name="person-outline"
@@ -109,6 +148,8 @@ const RegisterScreen = ({ navigation }) => {
 
                 <InputField
                     label={'Email'}
+                    value={email}
+                    onChangeText={text => setEmail(text)}
                     icon={
                         <MaterialIcons
                             name="alternate-email"
@@ -122,6 +163,8 @@ const RegisterScreen = ({ navigation }) => {
 
                 <InputField
                     label={'Password'}
+                    value={password}
+                    onChangeText={text => setPassword(text)}
                     icon={
                         <Ionicons
                             name="lock-closed-outline"
@@ -133,14 +176,15 @@ const RegisterScreen = ({ navigation }) => {
                     inputType="password"
                 />
 
-                <CustomButton label={'Register'} onPress={() => { }} />
+                <CustomButton label={'Register'} onPress={handleRegister} />
 
                 <View
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'center',
                         marginBottom: 30,
-                    }}>
+                    }}
+                >
                     <Text>Already registered?</Text>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Text style={{ color: '#018b8b', fontWeight: '700' }}> Login</Text>

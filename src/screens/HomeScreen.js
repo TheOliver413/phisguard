@@ -5,16 +5,79 @@ import BannerSlider from "../components/BannerSlider";
 import CustomSwitch from "../components/CustomSwitch";
 import ListItem from "../components/ListItem";
 
-import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInput, TouchableOpacity, Alert } from "react-native";
 import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
 import { freeGames, paidGames, sliderData } from "../model/data";
 import { widthHeigth, windowWidth } from "../utils/Dimensions";
 import { AuthContext } from "../context/AuthContext";
+import { BASE_URL } from "../../config";
+import axios from "axios";
 
 const HomeScreen = ({ navigation }) => {
-
+    const [url, setUrl] = useState("");
     const [tab, setTap] = useState('1')
-    const { userInfo } = useContext(AuthContext);
+    const [analysisResult, setAnalysisResult] = useState(null);
+    const { userInfo, isLoading } = useContext(AuthContext);
+    
+    const validateUrl = async () => {
+        if (!url) {
+            Alert.alert('Error', 'Por favor ingresa una URL');
+            return;
+        }
+        
+        try {
+            const email = userInfo.user.email;
+            const response = await axios.post(`${BASE_URL}/validate_url`, { url, email });
+            console.log("response: ", response)
+            // Extraemos los datos relevantes de la respuesta
+            const { domain, ip, phishing_message, reputation_result } = response.data;
+
+            // Actualizamos el estado con los resultados del análisis
+            setAnalysisResult({
+                domain,
+                ip,
+                phishingMessage: phishing_message,
+                reputationResult: reputation_result,
+            });
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error', 'Algo salió mal. Intenta nuevamente.');
+        }
+    };
+
+    const sendEmail = async () => {
+        try {
+            const email = userInfo.user.email;
+            const response = await axios.post(`${BASE_URL}/send-email`, {
+                subject: 'Reporte de Análisis de Phishing',
+                body: `Dominio: ${analysisResult.domain}\nIP: ${analysisResult.ip}\nMensaje de Phishing: ${analysisResult.phishingMessage}\nReputación: ${analysisResult.reputationResult}`,
+                recipient_email: email,
+            });
+
+            if (response.status === 200) {
+                Alert.alert("Éxito", "Correo enviado correctamente");
+            } else {
+                Alert.alert("Error", "No se pudo enviar el correo");
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "Hubo un problema al enviar el correo");
+        }
+    };
+
+    const handleClear = () => {
+        setAnalysisResult(null);
+        setUrl("");
+    };
+
+    // Esperamos que userInfo esté disponible
+    if (isLoading) {
+        return (
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#018b8b" />
+            </SafeAreaView>
+        );
+    }
 
     const renderBanner = ({ item, index }) => {
         return (<BannerSlider data={item} index={index} />)
@@ -28,7 +91,11 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
                 <View style={styles.container_img}>
-                    <Text style={styles.title}>Hello {userInfo.user.username}</Text>
+                    <Text style={styles.title}>
+                        {userInfo && userInfo.user && userInfo.user.username
+                            ? `Hola ${userInfo.user.username}`
+                            : 'Hola, Usuario'}
+                    </Text>
                     <TouchableOpacity onPress={() => navigation.openDrawer()}>
                         <ImageBackground
                             source={require('../assets/images/user-profile.jpg')}
@@ -40,14 +107,37 @@ const HomeScreen = ({ navigation }) => {
 
                 <View style={styles.containerInput}>
                     <Feather name="search" size={verticalScale(15)} color={"#C6C6C6C6"} style={styles.search} />
-                    <TextInput placeholder="URL" placeholderTextColor={'#000'} style={styles.url} />
+                    <TextInput
+                        placeholder="URL"
+                        placeholderTextColor={'#000'}
+                        style={styles.url}
+                        value={url}
+                        onChangeText={setUrl} // Actualiza el estado cuando cambia el texto
+                    />
+                    <TouchableOpacity style={styles.analyzeButton} onPress={validateUrl}>
+                        <Text style={styles.buttonText}>Analizar</Text>
+                    </TouchableOpacity>
                 </View>
 
+                {/* Mostrar resultados del análisis si existen */}
+                {analysisResult && (
+                    <View style={styles.analysisResult}>
+                        <Text style={styles.resultText}>Dominio: {analysisResult.domain}</Text>
+                        <Text style={styles.resultText}>IP: {analysisResult.ip}</Text>
+                        <Text style={styles.resultText}>Mensaje de Phishing: {analysisResult.phishingMessage}</Text>
+                        <Text style={styles.resultText}>Reputación: {analysisResult.reputationResult}</Text>
+                        <View style={styles.buttonContainer}>
+                            <Button title="Enviar Correo" onPress={sendEmail} />
+                            <Button title="Cerrar Reporte" onPress={handleClear} />
+                        </View>
+                    </View>
+                )}
+
                 <View style={styles.titleSection}>
-                    <Text style={styles.title}>Learn more about phishing</Text>
-                    <TouchableOpacity onPress={() => { }}>
+                    {/* <Text style={styles.title}>Obtenga más información sobre el phishing</Text> */}
+                    {/* <TouchableOpacity onPress={() => { }}>
                         <Text style={styles.span}>See all</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
 
                 <Carousel
@@ -125,7 +215,7 @@ const styles = ScaledSheet.create({
     container_img: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: '15@vs'
+        marginBottom: '10@vs'
     },
     title: {
         fontSize: '15@vs',
@@ -133,7 +223,7 @@ const styles = ScaledSheet.create({
         color: '#000'
     },
     imageBackground: {
-        width: '30@s',
+        width: '40@s',
         height: '35@vs',
     },
     containerInput: {
@@ -149,10 +239,22 @@ const styles = ScaledSheet.create({
     },
     url: {
         fontSize: '12@vs',
-        color: '#000'
+        color: '#000',
+        width: '70%'
+    },
+    analyzeButton: {
+        backgroundColor: '#018b8b',
+        paddingVertical: '5@vs',
+        paddingHorizontal: '10@s',
+        borderRadius: 5,
+        marginLeft: 'auto'
+    },
+    buttonText: {
+        color: '#FFF',
+        fontSize: '12@vs'
     },
     titleSection: {
-        marginVertical: '10@vs',
+        marginVertical: '5@vs',
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
@@ -165,6 +267,18 @@ const styles = ScaledSheet.create({
     },
     tabs: {
         marginBottom: '10@vs'
+    },
+    resultContainer: {
+        marginTop: '10@vs',
+        padding: '10@s',
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: '#C6C6C6',
+        backgroundColor: '#f8f8f8'
+    },
+    resultText: {
+        color: '#000',
+        fontSize: '14@vs'
     }
 });
 
