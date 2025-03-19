@@ -56,22 +56,22 @@ const TabNavigator = () => {
                     )
                 })}
             />
-            <Tab.Screen
+            {/* <Tab.Screen
                 name='Cart'
                 component={CartScreen}
                 options={{
                     tabBarIcon: ({ color }) => (
                         <Feather name='shopping-bag' color={color} size={verticalScale(14)} />
                     )
-                }} />
-            <Tab.Screen
+                }} /> */}
+            {/* <Tab.Screen
                 name='Favorites'
                 component={FavoriteScreen}
                 options={{
                     tabBarIcon: ({ color }) => (
                         <Feather name='heart' color={color} size={verticalScale(14)} />
                     )
-                }} />
+                }} /> */}
         </Tab.Navigator>
     );
 }

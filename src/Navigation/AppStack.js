@@ -33,7 +33,7 @@ const AppStack = () => {
                     )
                 }}
             />
-            <Drawer.Screen
+            {/* <Drawer.Screen
                 name='Profile'
                 component={ProfileScreen}
                 options={{
@@ -68,7 +68,7 @@ const AppStack = () => {
                         <Ionicons name='settings-outline' size={verticalScale(15)} color={color} />
                     )
                 }}
-            />
+            /> */}
         </Drawer.Navigator>
     )
 }
