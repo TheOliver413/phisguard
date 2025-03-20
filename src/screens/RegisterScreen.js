@@ -78,12 +78,13 @@ const RegisterScreen = ({ navigation }) => {
                         fontWeight: '500',
                         color: '#333',
                         marginBottom: 30,
+                        textAlign: 'center',
                     }}
                 >
                     Register
                 </Text>
 
-                <View
+                {/* <View
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -130,7 +131,7 @@ const RegisterScreen = ({ navigation }) => {
 
                 <Text style={{ textAlign: 'center', color: '#666', marginBottom: 30 }}>
                     Or, register with email ...
-                </Text>
+                </Text> */}
 
                 <InputField
                     label={'User Name'}

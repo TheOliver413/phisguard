@@ -73,15 +73,15 @@ const LoginScreen = ({ navigation }) => {
             />
           }
           inputType="password"
-          fieldButtonLabel={"Forgot?"}
-          fieldButtonFunction={() => { }}
+          // fieldButtonLabel={"Forgot?"}
+          // fieldButtonFunction={() => { }}
           value={password}
           onChangeText={text => setPassword(text)}
         />
 
         <CustomButton label={"Login"} onPress={() => { login(email, password) }} />
 
-        <Text style={{ textAlign: 'center', color: '#666', marginBottom: 30 }}>
+        {/* <Text style={{ textAlign: 'center', color: '#666', marginBottom: 30 }}>
           Or, login with ...
         </Text>
 
@@ -124,7 +124,7 @@ const LoginScreen = ({ navigation }) => {
             }}>
             <TwitterSVG height={24} width={24} />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View
           style={{

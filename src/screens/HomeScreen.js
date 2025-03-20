@@ -27,8 +27,9 @@ const HomeScreen = ({ navigation }) => {
 
         try {
             const email = userInfo.user.email;
-            const response = await axios.post(`${BASE_URL}/validate_url`, { url, email });
-            console.log("response: ", response)
+            const user_id = userInfo.user.user_id;
+            const response = await axios.post(`${BASE_URL}/validate_url`, { url, email, user_id });
+
             // Extraemos los datos relevantes de la respuesta
             const { domain, ip, phishing_message, reputation_result } = response.data;
 
@@ -44,16 +45,23 @@ const HomeScreen = ({ navigation }) => {
             Alert.alert('Error', 'Algo salió mal. Intenta nuevamente.');
         }
     };
+    console.log("analysisResult: "+JSON.stringify(analysisResult))
 
     const sendEmail = async () => {
         try {
             const email = userInfo.user.email;
+            const { domain, ip, phishingMessage, reputationResult } = analysisResult;
+    
+            const phishingDetails = phishingMessage
+                ? `Detectado: ${phishingMessage.detected ? 'Sí' : 'No'}\nMensaje: ${phishingMessage.message}\nNivel de Riesgo: ${phishingMessage.risk_level}`
+                : "No hay información de phishing.";
+    
             const response = await axios.post(`${BASE_URL}/send-email`, {
                 subject: 'Reporte de Análisis de Phishing',
-                body: `Dominio: ${analysisResult.domain}\nIP: ${analysisResult.ip}\nMensaje de Phishing: ${analysisResult.phishingMessage}\nReputación: ${analysisResult.reputationResult}`,
+                body: `Dominio: ${domain}\nIP: ${ip}\n${phishingDetails}\nReputación: ${reputationResult}`,
                 recipient_email: email,
             });
-
+    
             if (response.status === 200) {
                 Alert.alert("Éxito", "Correo enviado correctamente");
             } else {
@@ -122,10 +130,19 @@ const HomeScreen = ({ navigation }) => {
                 {/* Mostrar resultados del análisis si existen */}
                 {analysisResult && (
                     <View style={styles.analysisResult}>
-                        <Text style={styles.resultText}>Dominio: {analysisResult.domain}</Text>
-                        <Text style={styles.resultText}>IP: {analysisResult.ip}</Text>
-                        <Text style={styles.resultText}>Mensaje de Phishing: {analysisResult.phishingMessage}</Text>
-                        <Text style={styles.resultText}>Reputación: {analysisResult.reputationResult}</Text>
+                        <View>
+                            <Text style={styles.resultText}>🔍 Análisis de URL</Text>
+
+                            <Text style={styles.resultText}>🌐 Dominio: {analysisResult?.domain || 'No disponible'}</Text>
+                            <Text style={styles.resultText}>📌 IP: {analysisResult?.ip || 'No disponible'}</Text>
+
+                            <Text style={styles.resultText}>⚠️ Mensaje de Phishing:</Text>
+                            <Text style={styles.resultText}>   - Detectado: {analysisResult?.phishingMessage?.detected ? 'Sí' : 'No'}</Text>
+                            <Text style={styles.resultText}>   - Mensaje: {analysisResult?.phishingMessage?.message || 'No disponible'}</Text>
+                            <Text style={styles.resultText}>   - Nivel de Riesgo: {analysisResult?.phishingMessage?.risk_level || 'No disponible'}</Text>
+
+                            <Text style={styles.resultText}> {analysisResult?.reputationResult || 'No disponible'}</Text>
+                        </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
                             <TouchableOpacity style={styles.analyzeButton} onPress={sendEmail}>
                                 <Text style={styles.buttonText}>Enviar Correo</Text>
