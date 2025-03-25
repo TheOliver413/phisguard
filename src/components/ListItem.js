@@ -3,31 +3,30 @@ import { Text, TouchableOpacity, View, Image } from 'react-native'
 import { scale, verticalScale, ScaledSheet } from 'react-native-size-matters'
 import { windowWidth } from '../utils/Dimensions';
 
-export default function ListItem({ photo, title, subtitle, isFree, price, onPress }) {
+export default function ListItem({ image, title, description, onPress }) {
+    const defaultImage = require('../assets/images/default-news.jpg'); // Asegúrate de que la imagen existe
+
+
     return (
         <View style={styles.container}>
             <View style={styles.list}>
-                <Image source={photo} style={styles.img} />
+            <Image
+                    source={image && image.startsWith('http') ? { uri: image } : defaultImage}
+                    style={styles.img}
+                    onError={(e) => console.log("Error cargando la imagen:", e.nativeEvent.error)}
+                />
                 <View style={styles.texts}>
-                    <Text
-                        numberOfLines={2}
-                        style={styles.itemName}
-                    >
+                    <Text numberOfLines={2} style={styles.itemName}>
                         {title}
                     </Text>
-                    <Text
-                        numberOfLines={1}
-                        style={styles.subtitle}
-                    >
-                        {subtitle}
+                    <Text numberOfLines={2} style={styles.subtitle}>
+                        {description}
                     </Text>
                 </View>
             </View>
 
             <TouchableOpacity onPress={onPress} style={styles.btn}>
-                <Text style={styles.btnText}>
-                    {isFree === 'Yes' ? 'Ver' : price}
-                </Text>
+                <Text style={styles.btnText}>Leer más</Text>
             </TouchableOpacity>
         </View>
     )

@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Feather from 'react-native-vector-icons/Feather';
 import Carousel from 'react-native-reanimated-carousel';
 import BannerSlider from "../components/BannerSlider";
 import CustomSwitch from "../components/CustomSwitch";
 import ListItem from "../components/ListItem";
 
-import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInput, TouchableOpacity, Alert, Linking } from "react-native";
 import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
 import { freeGames, paidGames, sliderData } from "../model/data";
 import { widthHeigth, windowWidth } from "../utils/Dimensions";
@@ -18,6 +18,23 @@ const HomeScreen = ({ navigation }) => {
     const [tab, setTap] = useState('1')
     const [analysisResult, setAnalysisResult] = useState(null);
     const { userInfo, isLoading } = useContext(AuthContext);
+    const [news, setNews] = useState([]);
+    const [loadingNews, setLoadingNews] = useState(true);
+
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/news`);
+                // Extraer correctamente la lista de noticias
+                setNews(response.data.data || []);
+            } catch (error) {
+                console.error("Error al obtener noticias:", error);
+            } finally {
+                setLoadingNews(false);
+            }
+        };
+        fetchNews();
+    }, []);
 
     const validateUrl = async () => {
         if (!url) {
@@ -45,7 +62,6 @@ const HomeScreen = ({ navigation }) => {
             Alert.alert('Error', 'Algo salió mal. Intenta nuevamente.');
         }
     };
-    console.log("analysisResult: "+JSON.stringify(analysisResult))
 
     const sendEmail = async () => {
         try {
@@ -94,6 +110,17 @@ const HomeScreen = ({ navigation }) => {
     const onSelectSwitch = (value) => {
         setTap(value);
     }
+
+    const handleOpenURL = (url) => {
+        Alert.alert(
+            "Salir de la aplicación",
+            "Estás a punto de abrir un enlace externo. ¿Quieres continuar?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                { text: "Abrir", onPress: () => Linking.openURL(url) }
+            ]
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -175,50 +202,32 @@ const HomeScreen = ({ navigation }) => {
                 <View style={styles.switch}>
                     <CustomSwitch
                         selectionMode={1}
-                        option1={'Tap 1'}
-                        option2={'Tap 2'}
+                        option1={'Noticias'}
+                        option2={'Más Noticas'}
                         onSelectSwitch={onSelectSwitch}
                     />
                 </View>
 
                 <View style={styles.tabs}>
-                    {tab == 1 &&
-                        freeGames.map(item => (
-                            <ListItem
-                                key={item.id}
-                                photo={item.poster}
-                                title={item.title}
-                                subtitle={item.subtitle}
-                                isFree={item.isFree}
-                                price={item.price}
-                                onPress={() =>
-                                    navigation.navigate('DetailsScreen', {
-                                        title: item.title,
-                                        id: item.id
-                                    })
-                                }
-                            />
-                        ))
-                    }
+                    {tab == 1 && news.slice(0, Math.ceil(news.length / 2)).map(item => (
+                        <ListItem
+                            key={item.url} 
+                            photo={item.url_to_image}
+                            title={item.title}
+                            subtitle={item.description}
+                            onPress={() => handleOpenURL(item.url)}
+                        />
+                    ))}
 
-                    {tab == 2 &&
-                        paidGames.map(item => (
-                            <ListItem
-                                key={item.id}
-                                photo={item.poster}
-                                title={item.title}
-                                subtitle={item.subtitle}
-                                isFree={item.isFree}
-                                price={item.price}
-                                onPress={() =>
-                                    navigation.navigate('DetailsScreen', {
-                                        title: item.title,
-                                        id: item.id
-                                    })
-                                }
-                            />
-                        ))
-                    }
+                    {tab == 2 && news.slice(Math.ceil(news.length / 2)).map(item => (
+                        <ListItem
+                            key={item.url}
+                            photo={item.url_to_image}
+                            title={item.title}
+                            subtitle={item.description}
+                            onPress={() => handleOpenURL(item.url)}
+                        />
+                    ))}
                 </View>
             </ScrollView>
         </SafeAreaView>
