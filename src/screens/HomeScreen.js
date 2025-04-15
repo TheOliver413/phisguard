@@ -5,13 +5,55 @@ import BannerSlider from "../components/BannerSlider";
 import CustomSwitch from "../components/CustomSwitch";
 import ListItem from "../components/ListItem";
 
-import { View, Text, Button, SafeAreaView, ScrollView, ImageBackground, TextInput, TouchableOpacity, Alert, Linking } from "react-native";
+import { 
+    View, 
+    Text, 
+    SafeAreaView, 
+    ScrollView, 
+    ImageBackground, 
+    TextInput, 
+    TouchableOpacity, 
+    Alert, 
+    Linking,
+    useColorScheme,
+    ActivityIndicator
+} from "react-native";
 import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
 import { freeGames, paidGames, sliderData } from "../model/data";
 import { widthHeigth, windowWidth } from "../utils/Dimensions";
 import { AuthContext } from "../context/AuthContext";
 import { BASE_URL } from "../../config";
 import axios from "axios";
+
+// Theme colors for light and dark mode
+const theme = {
+    light: {
+        background: '#FFFFFF',
+        text: '#000000',
+        secondaryText: '#555555',
+        inputBackground: '#FFFFFF',
+        inputBorder: '#C6C6C6C6',
+        primary: '#018b8b',
+        cardBackground: '#FFFFFF',
+        resultBackground: '#f8f8f8',
+        resultBorder: '#C6C6C6',
+        placeholderColor: '#999999',
+        iconColor: '#C6C6C6C6',
+    },
+    dark: {
+        background: '#121212',
+        text: '#FFFFFF',
+        secondaryText: '#AAAAAA',
+        inputBackground: '#2A2A2A',
+        inputBorder: '#444444',
+        primary: '#02BEBE',
+        cardBackground: '#1E1E1E',
+        resultBackground: '#2A2A2A',
+        resultBorder: '#444444',
+        placeholderColor: '#777777',
+        iconColor: '#777777',
+    }
+};
 
 const HomeScreen = ({ navigation }) => {
     const [url, setUrl] = useState("");
@@ -20,6 +62,10 @@ const HomeScreen = ({ navigation }) => {
     const { userInfo, isLoading } = useContext(AuthContext);
     const [news, setNews] = useState([]);
     const [loadingNews, setLoadingNews] = useState(true);
+    const colorScheme = useColorScheme();
+    
+    // Default to light if colorScheme is null
+    const currentTheme = colorScheme === 'dark' ? theme.dark : theme.light;
 
     useEffect(() => {
         const fetchNews = async () => {
@@ -97,14 +143,14 @@ const HomeScreen = ({ navigation }) => {
     // Esperamos que userInfo esté disponible
     if (isLoading) {
         return (
-            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#018b8b" />
+            <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+                <ActivityIndicator size="large" color={currentTheme.primary} />
             </SafeAreaView>
         );
     }
 
     const renderBanner = ({ item, index }) => {
-        return (<BannerSlider data={item} index={index} />)
+        return (<BannerSlider data={item} index={index} theme={currentTheme} />)
     }
 
     const onSelectSwitch = (value) => {
@@ -123,10 +169,13 @@ const HomeScreen = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.scrollView}>
+        <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+            <ScrollView 
+                style={[styles.scrollView, { backgroundColor: currentTheme.background }]}
+                showsVerticalScrollIndicator={false}
+            >
                 <View style={styles.container_img}>
-                    <Text style={styles.title}>
+                    <Text style={[styles.title, { color: currentTheme.text }]}>
                         {userInfo && userInfo.user && userInfo.user.username
                             ? `Hola ${userInfo.user.username}`
                             : 'Hola, Usuario'}
@@ -140,41 +189,83 @@ const HomeScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.containerInput}>
-                    <Feather name="search" size={verticalScale(15)} color={"#C6C6C6C6"} style={styles.search} />
+                <View style={[
+                    styles.containerInput, 
+                    { 
+                        backgroundColor: currentTheme.inputBackground,
+                        borderColor: currentTheme.inputBorder 
+                    }
+                ]}>
+                    <Feather 
+                        name="search" 
+                        size={verticalScale(15)} 
+                        color={currentTheme.iconColor} 
+                        style={styles.search} 
+                    />
                     <TextInput
                         placeholder="URL"
-                        placeholderTextColor={'#000'}
-                        style={styles.url}
+                        placeholderTextColor={currentTheme.placeholderColor}
+                        style={[styles.url, { color: currentTheme.text }]}
                         value={url}
-                        onChangeText={setUrl} // Actualiza el estado cuando cambia el texto
+                        onChangeText={setUrl}
                     />
-                    <TouchableOpacity style={styles.analyzeButton} onPress={validateUrl}>
+                    <TouchableOpacity 
+                        style={[styles.analyzeButton, { backgroundColor: currentTheme.primary }]} 
+                        onPress={validateUrl}
+                    >
                         <Text style={styles.buttonText}>Analizar</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Mostrar resultados del análisis si existen */}
                 {analysisResult && (
-                    <View style={styles.analysisResult}>
+                    <View style={[
+                        styles.analysisResult, 
+                        { 
+                            backgroundColor: currentTheme.resultBackground,
+                            borderColor: currentTheme.resultBorder 
+                        }
+                    ]}>
                         <View>
-                            <Text style={styles.resultText}>🔍 Análisis de URL</Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text, fontWeight: 'bold' }]}>
+                                🔍 Análisis de URL
+                            </Text>
 
-                            <Text style={styles.resultText}>🌐 Dominio: {analysisResult?.domain || 'No disponible'}</Text>
-                            <Text style={styles.resultText}>📌 IP: {analysisResult?.ip || 'No disponible'}</Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
+                                🌐 Dominio: {analysisResult?.domain || 'No disponible'}
+                            </Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
+                                📌 IP: {analysisResult?.ip || 'No disponible'}
+                            </Text>
 
-                            <Text style={styles.resultText}>⚠️ Mensaje de Phishing:</Text>
-                            <Text style={styles.resultText}>   - Detectado: {analysisResult?.phishingMessage?.detected ? 'Sí' : 'No'}</Text>
-                            <Text style={styles.resultText}>   - Mensaje: {analysisResult?.phishingMessage?.message || 'No disponible'}</Text>
-                            <Text style={styles.resultText}>   - Nivel de Riesgo: {analysisResult?.phishingMessage?.risk_level || 'No disponible'}</Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text, fontWeight: 'bold', marginTop: 10 }]}>
+                                ⚠️ Mensaje de Phishing:
+                            </Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
+                                   - Detectado: {analysisResult?.phishingMessage?.detected ? 'Sí' : 'No'}
+                            </Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
+                                   - Mensaje: {analysisResult?.phishingMessage?.message || 'No disponible'}
+                            </Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
+                                   - Nivel de Riesgo: {analysisResult?.phishingMessage?.risk_level || 'No disponible'}
+                            </Text>
 
-                            <Text style={styles.resultText}> {analysisResult?.reputationResult || 'No disponible'}</Text>
+                            <Text style={[styles.resultText, { color: currentTheme.text, marginTop: 10 }]}>
+                                {analysisResult?.reputationResult || 'No disponible'}
+                            </Text>
                         </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
-                            <TouchableOpacity style={styles.analyzeButton} onPress={sendEmail}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 15 }}>
+                            <TouchableOpacity 
+                                style={[styles.analyzeButton, { backgroundColor: currentTheme.primary }]} 
+                                onPress={sendEmail}
+                            >
                                 <Text style={styles.buttonText}>Enviar Correo</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.analyzeButton} onPress={handleClear}>
+                            <TouchableOpacity 
+                                style={[styles.analyzeButton, { backgroundColor: currentTheme.primary }]} 
+                                onPress={handleClear}
+                            >
                                 <Text style={styles.buttonText}>Cerrar Reporte</Text>
                             </TouchableOpacity>
                         </View>
@@ -182,10 +273,7 @@ const HomeScreen = ({ navigation }) => {
                 )}
 
                 <View style={styles.titleSection}>
-                    {/* <Text style={styles.title}>Obtenga más información sobre el phishing</Text> */}
-                    {/* <TouchableOpacity onPress={() => { }}>
-                        <Text style={styles.span}>See all</Text>
-                    </TouchableOpacity> */}
+                    {/* Title section content if needed */}
                 </View>
 
                 <Carousel
@@ -205,6 +293,7 @@ const HomeScreen = ({ navigation }) => {
                         option1={'Noticias'}
                         option2={'Más Noticas'}
                         onSelectSwitch={onSelectSwitch}
+                        theme={currentTheme}
                     />
                 </View>
 
@@ -216,6 +305,7 @@ const HomeScreen = ({ navigation }) => {
                             title={item.title}
                             subtitle={item.description}
                             onPress={() => handleOpenURL(item.url)}
+                            theme={currentTheme}
                         />
                     ))}
 
@@ -226,6 +316,7 @@ const HomeScreen = ({ navigation }) => {
                             title={item.title}
                             subtitle={item.description}
                             onPress={() => handleOpenURL(item.url)}
+                            theme={currentTheme}
                         />
                     ))}
                 </View>
@@ -237,10 +328,9 @@ const HomeScreen = ({ navigation }) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF'
     },
     scrollView: {
-        padding: '20@vs'
+        padding: '20@vs',
     },
     container_img: {
         flexDirection: 'row',
@@ -250,7 +340,6 @@ const styles = ScaledSheet.create({
     title: {
         fontSize: '15@vs',
         fontFamily: 'Roboto-Medium',
-        color: '#000'
     },
     imageBackground: {
         width: '40@s',
@@ -258,22 +347,21 @@ const styles = ScaledSheet.create({
     },
     containerInput: {
         flexDirection: 'row',
-        borderColor: '#C6C6C6C6',
         borderWidth: '1@s',
         borderRadius: 8,
         paddingHorizontal: '10@s',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: '10@vs',
     },
     search: {
         marginRight: '5@s'
     },
     url: {
         fontSize: '12@vs',
-        color: '#000',
-        width: '70%'
+        width: '70%',
+        paddingVertical: '8@vs',
     },
     analyzeButton: {
-        backgroundColor: '#018b8b',
         paddingVertical: '5@vs',
         paddingHorizontal: '10@s',
         borderRadius: 5,
@@ -289,31 +377,23 @@ const styles = ScaledSheet.create({
         justifyContent: 'space-between'
     },
     span: {
-        color: '#008b8b',
         fontSize: '15@vs'
     },
     switch: {
-        marginVertical: '10@vs'
+        marginVertical: '15@vs'
     },
     tabs: {
         marginBottom: '10@vs'
     },
-    resultContainer: {
-        marginTop: '10@vs',
-        padding: '10@s',
+    analysisResult: {
+        marginVertical: '15@vs',
+        padding: '15@s',
         borderWidth: 1,
         borderRadius: 8,
-        borderColor: '#C6C6C6',
-        backgroundColor: '#f8f8f8'
     },
     resultText: {
-        color: '#000',
-        fontSize: '14@vs'
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: '10@vs'
+        fontSize: '14@vs',
+        marginBottom: '3@vs',
     },
 });
 

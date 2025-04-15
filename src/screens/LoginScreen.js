@@ -1,10 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
+  useColorScheme,
+  StyleSheet,
+  StatusBar,
 } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -19,31 +21,56 @@ import CustomButton from '../components/CustomButton';
 import InputField from '../components/InputField';
 import { AuthContext } from '../context/AuthContext';
 
+// Theme colors for light and dark mode
+const theme = {
+  light: {
+    background: '#FFFFFF',
+    text: '#333333',
+    secondaryText: '#666666',
+    border: '#DDDDDD',
+    primary: '#018b8b',
+    inputBackground: '#F5F5F5',
+    statusBar: 'dark-content',
+  },
+  dark: {
+    background: '#121212',
+    text: '#FFFFFF',
+    secondaryText: '#AAAAAA',
+    border: '#444444',
+    primary: '#02BEBE',
+    inputBackground: '#2A2A2A',
+    statusBar: 'light-content',
+  }
+};
+
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const colorScheme = useColorScheme();
+  
+  // Default to light if colorScheme is null
+  const currentTheme = colorScheme === 'dark' ? theme.dark : theme.light;
 
   const { login } = useContext(AuthContext);
   
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
-      <View style={{ paddingHorizontal: 25 }}>
-        <View style={{ alignItems: 'center' }}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+      <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.background} />
+      
+      <View style={styles.contentContainer}>
+        <View style={styles.logoContainer}>
           <LoginSVG
             height={300}
             width={300}
-            style={{ transform: [{ rotate: '-5deg' }] }}
+            style={styles.logo}
           />
         </View>
 
         <Text
-          style={{
-            fontFamily: 'Roboto-Medium',
-            fontSize: 28,
-            fontWeight: '500',
-            color: '#333',
-            marginBottom: 30,
-          }}>
+          style={[
+            styles.title,
+            { color: currentTheme.text }
+          ]}>
           Login
         </Text>
 
@@ -53,13 +80,20 @@ const LoginScreen = ({ navigation }) => {
             <MaterialIcons
               name="alternate-email"
               size={20}
-              color="#666"
-              style={{ marginRight: 5 }}
+              color={currentTheme.secondaryText}
+              style={styles.inputIcon}
             />
           }
           keyboardType="email-address"
           value={email}
           onChangeText={text => setEmail(text)}
+          // Pass theme colors to InputField
+          themeColors={{
+            text: currentTheme.text,
+            background: currentTheme.inputBackground,
+            border: currentTheme.border,
+            placeholder: currentTheme.secondaryText
+          }}
         />
 
         <InputField
@@ -68,78 +102,79 @@ const LoginScreen = ({ navigation }) => {
             <Ionicons
               name="lock-closed-outline"
               size={20}
-              color="#666"
-              style={{ marginRight: 5 }}
+              color={currentTheme.secondaryText}
+              style={styles.inputIcon}
             />
           }
           inputType="password"
-          // fieldButtonLabel={"Forgot?"}
-          // fieldButtonFunction={() => { }}
           value={password}
           onChangeText={text => setPassword(text)}
+          // Pass theme colors to InputField
+          themeColors={{
+            text: currentTheme.text,
+            background: currentTheme.inputBackground,
+            border: currentTheme.border,
+            placeholder: currentTheme.secondaryText
+          }}
         />
 
-        <CustomButton label={"Login"} onPress={() => { login(email, password) }} />
+        <CustomButton 
+          label={"Login"} 
+          onPress={() => { login(email, password) }}
+          // Pass theme colors to CustomButton
+          themeColors={{
+            background: currentTheme.primary,
+            text: '#FFFFFF'
+          }}
+        />
 
-        {/* <Text style={{ textAlign: 'center', color: '#666', marginBottom: 30 }}>
-          Or, login with ...
-        </Text>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: 30,
-          }}>
-          <TouchableOpacity
-            onPress={() => { }}
-            style={{
-              borderColor: '#ddd',
-              borderWidth: 2,
-              borderRadius: 10,
-              paddingHorizontal: 30,
-              paddingVertical: 10,
-            }}>
-            <GoogleSVG height={24} width={24} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { }}
-            style={{
-              borderColor: '#ddd',
-              borderWidth: 2,
-              borderRadius: 10,
-              paddingHorizontal: 30,
-              paddingVertical: 10,
-            }}>
-            <FacebookSVG height={24} width={24} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { }}
-            style={{
-              borderColor: '#ddd',
-              borderWidth: 2,
-              borderRadius: 10,
-              paddingHorizontal: 30,
-              paddingVertical: 10,
-            }}>
-            <TwitterSVG height={24} width={24} />
-          </TouchableOpacity>
-        </View> */}
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginBottom: 30,
-          }}>
-          <Text>New to the app?</Text>
+        <View style={styles.registerContainer}>
+          <Text style={{ color: currentTheme.secondaryText }}>
+            New to the app?
+          </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={{ color: '#018b8b', fontWeight: '700' }}> Register</Text>
+            <Text style={[styles.registerText, { color: currentTheme.primary }]}>
+              {' Register'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  contentContainer: {
+    paddingHorizontal: 25,
+  },
+  logoContainer: {
+    alignItems: 'center',
+  },
+  logo: {
+    transform: [{ rotate: '-5deg' }]
+  },
+  title: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 28,
+    fontWeight: '500',
+    marginBottom: 30,
+  },
+  inputIcon: {
+    marginRight: 5,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 30,
+    marginTop: 20,
+  },
+  registerText: {
+    fontWeight: '700',
+  },
+});
 
 export default LoginScreen;

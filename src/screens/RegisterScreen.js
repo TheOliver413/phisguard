@@ -4,12 +4,12 @@ import {
     ScrollView,
     View,
     Text,
-    TextInput,
     TouchableOpacity,
     Alert,
+    StyleSheet,
+    useColorScheme,
+    StatusBar,
 } from 'react-native';
-
-import DatePicker from 'react-native-date-picker';
 
 import InputField from '../components/InputField';
 
@@ -17,20 +17,42 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import RegistrationSVG from '../assets/images/misc/registration.svg';
-import GoogleSVG from '../assets/images/misc/google.svg';
-import FacebookSVG from '../assets/images/misc/facebook.svg';
-import TwitterSVG from '../assets/images/misc/twitter.svg';
 import CustomButton from '../components/CustomButton';
 import { BASE_URL } from '../../config';
 import axios from 'axios';
+
+// Theme colors for light and dark mode
+const theme = {
+    light: {
+        background: '#FFFFFF',
+        text: '#333333',
+        secondaryText: '#666666',
+        border: '#DDDDDD',
+        primary: '#018b8b',
+        inputBackground: '#F5F5F5',
+        statusBar: 'dark-content',
+    },
+    dark: {
+        background: '#121212',
+        text: '#FFFFFF',
+        secondaryText: '#AAAAAA',
+        border: '#444444',
+        primary: '#02BEBE',
+        inputBackground: '#2A2A2A',
+        statusBar: 'light-content',
+    }
+};
 
 const RegisterScreen = ({ navigation }) => {
     const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const colorScheme = useColorScheme();
+    
+    // Default to light if colorScheme is null
+    const currentTheme = colorScheme === 'dark' ? theme.dark : theme.light;
 
     const handleRegister = () => {
-
         if (!userName || !email || !password) {
             Alert.alert('Error', 'Por favor llena todos los campos');
             return;
@@ -61,77 +83,25 @@ const RegisterScreen = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
-            <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: 25 }}>
-                <View style={{ alignItems: 'center' }}>
+        <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+            <StatusBar barStyle={currentTheme.statusBar} backgroundColor={currentTheme.background} />
+            
+            <ScrollView 
+                showsVerticalScrollIndicator={false} 
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollViewContent}
+            >
+                <View style={styles.logoContainer}>
                     <RegistrationSVG
                         height={300}
                         width={300}
-                        style={{ transform: [{ rotate: '-5deg' }] }}
+                        style={styles.logo}
                     />
                 </View>
 
-                <Text
-                    style={{
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 28,
-                        fontWeight: '500',
-                        color: '#333',
-                        marginBottom: 30,
-                        textAlign: 'center',
-                    }}
-                >
+                <Text style={[styles.title, { color: currentTheme.text }]}>
                     Register
                 </Text>
-
-                {/* <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        marginBottom: 30,
-                    }}
-                >
-                    <TouchableOpacity
-                        onPress={() => { }}
-                        style={{
-                            borderColor: '#ddd',
-                            borderWidth: 2,
-                            borderRadius: 10,
-                            paddingHorizontal: 30,
-                            paddingVertical: 10,
-                        }}
-                    >
-                        <GoogleSVG height={24} width={24} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => { }}
-                        style={{
-                            borderColor: '#ddd',
-                            borderWidth: 2,
-                            borderRadius: 10,
-                            paddingHorizontal: 30,
-                            paddingVertical: 10,
-                        }}
-                    >
-                        <FacebookSVG height={24} width={24} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => { }}
-                        style={{
-                            borderColor: '#ddd',
-                            borderWidth: 2,
-                            borderRadius: 10,
-                            paddingHorizontal: 30,
-                            paddingVertical: 10,
-                        }}
-                    >
-                        <TwitterSVG height={24} width={24} />
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={{ textAlign: 'center', color: '#666', marginBottom: 30 }}>
-                    Or, register with email ...
-                </Text> */}
 
                 <InputField
                     label={'User Name'}
@@ -141,10 +111,16 @@ const RegisterScreen = ({ navigation }) => {
                         <Ionicons
                             name="person-outline"
                             size={20}
-                            color="#666"
-                            style={{ marginRight: 5 }}
+                            color={currentTheme.secondaryText}
+                            style={styles.inputIcon}
                         />
                     }
+                    themeColors={{
+                        text: currentTheme.text,
+                        background: currentTheme.inputBackground,
+                        border: currentTheme.border,
+                        placeholder: currentTheme.secondaryText
+                    }}
                 />
 
                 <InputField
@@ -155,11 +131,17 @@ const RegisterScreen = ({ navigation }) => {
                         <MaterialIcons
                             name="alternate-email"
                             size={20}
-                            color="#666"
-                            style={{ marginRight: 5 }}
+                            color={currentTheme.secondaryText}
+                            style={styles.inputIcon}
                         />
                     }
                     keyboardType="email-address"
+                    themeColors={{
+                        text: currentTheme.text,
+                        background: currentTheme.inputBackground,
+                        border: currentTheme.border,
+                        placeholder: currentTheme.secondaryText
+                    }}
                 />
 
                 <InputField
@@ -170,30 +152,82 @@ const RegisterScreen = ({ navigation }) => {
                         <Ionicons
                             name="lock-closed-outline"
                             size={20}
-                            color="#666"
-                            style={{ marginRight: 5 }}
+                            color={currentTheme.secondaryText}
+                            style={styles.inputIcon}
                         />
                     }
                     inputType="password"
+                    themeColors={{
+                        text: currentTheme.text,
+                        background: currentTheme.inputBackground,
+                        border: currentTheme.border,
+                        placeholder: currentTheme.secondaryText
+                    }}
                 />
 
-                <CustomButton label={'Register'} onPress={handleRegister} />
-
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        marginBottom: 30,
+                <CustomButton 
+                    label={'Register'} 
+                    onPress={handleRegister}
+                    themeColors={{
+                        background: currentTheme.primary,
+                        text: '#FFFFFF'
                     }}
-                >
-                    <Text>Already registered?</Text>
+                />
+
+                <View style={styles.loginContainer}>
+                    <Text style={{ color: currentTheme.secondaryText }}>
+                        Already registered?
+                    </Text>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ color: '#018b8b', fontWeight: '700' }}> Login</Text>
+                        <Text style={[styles.loginText, { color: currentTheme.primary }]}>
+                            {' Login'}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    scrollView: {
+        paddingHorizontal: 25,
+    },
+    scrollViewContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingVertical: 30,
+    },
+    logoContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    logo: {
+        transform: [{ rotate: '-5deg' }]
+    },
+    title: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 28,
+        fontWeight: '500',
+        marginBottom: 30,
+        textAlign: 'center',
+    },
+    inputIcon: {
+        marginRight: 5,
+    },
+    loginContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 30,
+        marginTop: 10,
+    },
+    loginText: {
+        fontWeight: '700',
+    },
+});
 
 export default RegisterScreen;
