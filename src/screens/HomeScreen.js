@@ -16,14 +16,17 @@ import {
     Alert, 
     Linking,
     useColorScheme,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal,
+    Pressable
 } from "react-native";
-import { scale, ScaledSheet, verticalScale } from "react-native-size-matters";
+import { scale, ScaledSheet, verticalScale, moderateScale } from "react-native-size-matters";
 import { freeGames, paidGames, sliderData } from "../model/data";
 import { widthHeigth, windowWidth } from "../utils/Dimensions";
 import { AuthContext } from "../context/AuthContext";
 import { BASE_URL } from "../../config";
 import axios from "axios";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Theme colors for light and dark mode
 const theme = {
@@ -39,6 +42,12 @@ const theme = {
         resultBorder: '#C6C6C6',
         placeholderColor: '#999999',
         iconColor: '#C6C6C6C6',
+        loaderBackground: 'rgba(255, 255, 255, 0.8)',
+        modalBackground: '#FFFFFF',
+        modalOverlay: 'rgba(0, 0, 0, 0.5)',
+        danger: '#e74c3c',
+        warning: '#f39c12',
+        success: '#2ecc71',
     },
     dark: {
         background: '#121212',
@@ -52,6 +61,12 @@ const theme = {
         resultBorder: '#444444',
         placeholderColor: '#777777',
         iconColor: '#777777',
+        loaderBackground: 'rgba(18, 18, 18, 0.8)',
+        modalBackground: '#1E1E1E',
+        modalOverlay: 'rgba(0, 0, 0, 0.7)',
+        danger: '#e74c3c',
+        warning: '#f39c12',
+        success: '#2ecc71',
     }
 };
 
@@ -59,9 +74,11 @@ const HomeScreen = ({ navigation }) => {
     const [url, setUrl] = useState("");
     const [tab, setTap] = useState('1')
     const [analysisResult, setAnalysisResult] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
     const { userInfo, isLoading } = useContext(AuthContext);
     const [news, setNews] = useState([]);
     const [loadingNews, setLoadingNews] = useState(true);
+    const [analyzingUrl, setAnalyzingUrl] = useState(false);
     const colorScheme = useColorScheme();
     
     // Default to light if colorScheme is null
@@ -89,6 +106,9 @@ const HomeScreen = ({ navigation }) => {
         }
 
         try {
+            setAnalyzingUrl(true); // Activar el loader
+            setAnalysisResult(null); // Limpiar resultados anteriores
+            
             const email = userInfo.user.email;
             const user_id = userInfo.user.user_id;
             const response = await axios.post(`${BASE_URL}/validate_url`, { url, email, user_id });
@@ -103,9 +123,14 @@ const HomeScreen = ({ navigation }) => {
                 phishingMessage: phishing_message,
                 reputationResult: reputation_result,
             });
+            
+            // Mostrar el modal con los resultados
+            setModalVisible(true);
         } catch (error) {
             console.error(error);
             Alert.alert('Error', 'Algo salió mal. Intenta nuevamente.');
+        } finally {
+            setAnalyzingUrl(false); // Desactivar el loader independientemente del resultado
         }
     };
 
@@ -137,7 +162,23 @@ const HomeScreen = ({ navigation }) => {
 
     const handleClear = () => {
         setAnalysisResult(null);
+        setModalVisible(false);
         setUrl("");
+    };
+
+    // Determinar el color del nivel de riesgo
+    const getRiskColor = (riskLevel) => {
+        if (!riskLevel) return currentTheme.secondaryText;
+        
+        riskLevel = riskLevel.toLowerCase();
+        if (riskLevel.includes('alto') || riskLevel.includes('high')) {
+            return currentTheme.danger;
+        } else if (riskLevel.includes('medio') || riskLevel.includes('medium')) {
+            return currentTheme.warning;
+        } else if (riskLevel.includes('bajo') || riskLevel.includes('low')) {
+            return currentTheme.success;
+        }
+        return currentTheme.secondaryText;
     };
 
     // Esperamos que userInfo esté disponible
@@ -170,6 +211,126 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+            {/* Modal de resultados del análisis */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={[styles.centeredView, { backgroundColor: currentTheme.modalOverlay }]}>
+                    <View style={[styles.modalView, { backgroundColor: currentTheme.modalBackground }]}>
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle, { color: currentTheme.text }]}>
+                                Resultado del Análisis
+                            </Text>
+                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                <Ionicons name="close" size={moderateScale(24)} color={currentTheme.text} />
+                            </TouchableOpacity>
+                        </View>
+                        
+                        <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+                            {analysisResult && (
+                                <View>
+                                    <View style={styles.resultSection}>
+                                        <Text style={[styles.sectionTitle, { color: currentTheme.text }]}>
+                                            🌐 Información del Dominio
+                                        </Text>
+                                        <View style={styles.resultItem}>
+                                            <Text style={[styles.resultLabel, { color: currentTheme.secondaryText }]}>
+                                                Dominio:
+                                            </Text>
+                                            <Text style={[styles.resultValue, { color: currentTheme.text }]}>
+                                                {analysisResult.domain || 'No disponible'}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.resultItem}>
+                                            <Text style={[styles.resultLabel, { color: currentTheme.secondaryText }]}>
+                                                IP:
+                                            </Text>
+                                            <Text style={[styles.resultValue, { color: currentTheme.text }]}>
+                                                {analysisResult.ip || 'No disponible'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.resultSection}>
+                                        <Text style={[styles.sectionTitle, { color: currentTheme.text }]}>
+                                            ⚠️ Análisis de Phishing
+                                        </Text>
+                                        <View style={styles.resultItem}>
+                                            <Text style={[styles.resultLabel, { color: currentTheme.secondaryText }]}>
+                                                Detectado:
+                                            </Text>
+                                            <Text style={[
+                                                styles.resultValue, 
+                                                { 
+                                                    color: analysisResult.phishingMessage?.detected 
+                                                        ? currentTheme.danger 
+                                                        : currentTheme.success,
+                                                    fontWeight: 'bold'
+                                                }
+                                            ]}>
+                                                {analysisResult.phishingMessage?.detected ? 'Sí' : 'No'}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.resultItem}>
+                                            <Text style={[styles.resultLabel, { color: currentTheme.secondaryText }]}>
+                                                Mensaje:
+                                            </Text>
+                                            <Text style={[styles.resultValue, { color: currentTheme.text }]}>
+                                                {analysisResult.phishingMessage?.message || 'No disponible'}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.resultItem}>
+                                            <Text style={[styles.resultLabel, { color: currentTheme.secondaryText }]}>
+                                                Nivel de Riesgo:
+                                            </Text>
+                                            <Text style={[
+                                                styles.resultValue, 
+                                                { 
+                                                    color: getRiskColor(analysisResult.phishingMessage?.risk_level),
+                                                    fontWeight: 'bold'
+                                                }
+                                            ]}>
+                                                {analysisResult.phishingMessage?.risk_level || 'No disponible'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.resultSection}>
+                                        <Text style={[styles.sectionTitle, { color: currentTheme.text }]}>
+                                            📊 Reputación
+                                        </Text>
+                                        <Text style={[styles.reputationText, { color: currentTheme.text }]}>
+                                            {analysisResult.reputationResult || 'No disponible'}
+                                        </Text>
+                                    </View>
+                                </View>
+                            )}
+                        </ScrollView>
+                        
+                        <View style={styles.modalActions}>
+                            <TouchableOpacity 
+                                style={[styles.modalButton, { backgroundColor: currentTheme.primary }]}
+                                onPress={sendEmail}
+                            >
+                                <Ionicons name="mail-outline" size={moderateScale(16)} color="#FFFFFF" />
+                                <Text style={styles.modalButtonText}>Enviar Reporte</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity 
+                                style={[styles.modalButton, { backgroundColor: currentTheme.secondaryText }]}
+                                onPress={handleClear}
+                            >
+                                <Ionicons name="close-circle-outline" size={moderateScale(16)} color="#FFFFFF" />
+                                <Text style={styles.modalButtonText}>Cerrar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
             <ScrollView 
                 style={[styles.scrollView, { backgroundColor: currentTheme.background }]}
                 showsVerticalScrollIndicator={false}
@@ -208,67 +369,34 @@ const HomeScreen = ({ navigation }) => {
                         style={[styles.url, { color: currentTheme.text }]}
                         value={url}
                         onChangeText={setUrl}
+                        editable={!analyzingUrl} // Deshabilitar durante el análisis
                     />
                     <TouchableOpacity 
-                        style={[styles.analyzeButton, { backgroundColor: currentTheme.primary }]} 
+                        style={[
+                            styles.analyzeButton, 
+                            { 
+                                backgroundColor: analyzingUrl ? currentTheme.secondaryText : currentTheme.primary,
+                                opacity: analyzingUrl ? 0.7 : 1
+                            }
+                        ]} 
                         onPress={validateUrl}
+                        disabled={analyzingUrl} // Deshabilitar durante el análisis
                     >
-                        <Text style={styles.buttonText}>Analizar</Text>
+                        {analyzingUrl ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                            <Text style={styles.buttonText}>Analizar</Text>
+                        )}
                     </TouchableOpacity>
                 </View>
 
-                {/* Mostrar resultados del análisis si existen */}
-                {analysisResult && (
-                    <View style={[
-                        styles.analysisResult, 
-                        { 
-                            backgroundColor: currentTheme.resultBackground,
-                            borderColor: currentTheme.resultBorder 
-                        }
-                    ]}>
-                        <View>
-                            <Text style={[styles.resultText, { color: currentTheme.text, fontWeight: 'bold' }]}>
-                                🔍 Análisis de URL
-                            </Text>
-
-                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
-                                🌐 Dominio: {analysisResult?.domain || 'No disponible'}
-                            </Text>
-                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
-                                📌 IP: {analysisResult?.ip || 'No disponible'}
-                            </Text>
-
-                            <Text style={[styles.resultText, { color: currentTheme.text, fontWeight: 'bold', marginTop: 10 }]}>
-                                ⚠️ Mensaje de Phishing:
-                            </Text>
-                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
-                                   - Detectado: {analysisResult?.phishingMessage?.detected ? 'Sí' : 'No'}
-                            </Text>
-                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
-                                   - Mensaje: {analysisResult?.phishingMessage?.message || 'No disponible'}
-                            </Text>
-                            <Text style={[styles.resultText, { color: currentTheme.text }]}>
-                                   - Nivel de Riesgo: {analysisResult?.phishingMessage?.risk_level || 'No disponible'}
-                            </Text>
-
-                            <Text style={[styles.resultText, { color: currentTheme.text, marginTop: 10 }]}>
-                                {analysisResult?.reputationResult || 'No disponible'}
-                            </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 15 }}>
-                            <TouchableOpacity 
-                                style={[styles.analyzeButton, { backgroundColor: currentTheme.primary }]} 
-                                onPress={sendEmail}
-                            >
-                                <Text style={styles.buttonText}>Enviar Correo</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity 
-                                style={[styles.analyzeButton, { backgroundColor: currentTheme.primary }]} 
-                                onPress={handleClear}
-                            >
-                                <Text style={styles.buttonText}>Cerrar Reporte</Text>
-                            </TouchableOpacity>
-                        </View>
+                {/* Loader para el análisis */}
+                {analyzingUrl && (
+                    <View style={[styles.analysisLoader, { backgroundColor: currentTheme.resultBackground }]}>
+                        <ActivityIndicator size="large" color={currentTheme.primary} />
+                        <Text style={[styles.loaderText, { color: currentTheme.text }]}>
+                            Analizando URL...
+                        </Text>
                     </View>
                 )}
 
@@ -297,29 +425,39 @@ const HomeScreen = ({ navigation }) => {
                     />
                 </View>
 
-                <View style={styles.tabs}>
-                    {tab == 1 && news.slice(0, Math.ceil(news.length / 2)).map(item => (
-                        <ListItem
-                            key={item.url} 
-                            photo={item.url_to_image}
-                            title={item.title}
-                            subtitle={item.description}
-                            onPress={() => handleOpenURL(item.url)}
-                            theme={currentTheme}
-                        />
-                    ))}
+                {/* Loader para las noticias */}
+                {loadingNews ? (
+                    <View style={styles.newsLoader}>
+                        <ActivityIndicator size="large" color={currentTheme.primary} />
+                        <Text style={[styles.loaderText, { color: currentTheme.text }]}>
+                            Cargando noticias...
+                        </Text>
+                    </View>
+                ) : (
+                    <View style={styles.tabs}>
+                        {tab == 1 && news.slice(0, Math.ceil(news.length / 2)).map(item => (
+                            <ListItem
+                                key={item.url} 
+                                photo={item.url_to_image}
+                                title={item.title}
+                                subtitle={item.description}
+                                onPress={() => handleOpenURL(item.url)}
+                                theme={currentTheme}
+                            />
+                        ))}
 
-                    {tab == 2 && news.slice(Math.ceil(news.length / 2)).map(item => (
-                        <ListItem
-                            key={item.url}
-                            photo={item.url_to_image}
-                            title={item.title}
-                            subtitle={item.description}
-                            onPress={() => handleOpenURL(item.url)}
-                            theme={currentTheme}
-                        />
-                    ))}
-                </View>
+                        {tab == 2 && news.slice(Math.ceil(news.length / 2)).map(item => (
+                            <ListItem
+                                key={item.url}
+                                photo={item.url_to_image}
+                                title={item.title}
+                                subtitle={item.description}
+                                onPress={() => handleOpenURL(item.url)}
+                                theme={currentTheme}
+                            />
+                        ))}
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     )
@@ -365,7 +503,10 @@ const styles = ScaledSheet.create({
         paddingVertical: '5@vs',
         paddingHorizontal: '10@s',
         borderRadius: 5,
-        marginLeft: 'auto'
+        marginLeft: 'auto',
+        minWidth: '60@s',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     buttonText: {
         color: '#FFF',
@@ -385,15 +526,106 @@ const styles = ScaledSheet.create({
     tabs: {
         marginBottom: '10@vs'
     },
-    analysisResult: {
+    analysisLoader: {
         marginVertical: '15@vs',
-        padding: '15@s',
-        borderWidth: 1,
+        padding: '20@s',
         borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    resultText: {
+    newsLoader: {
+        padding: '20@vs',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loaderText: {
+        marginTop: '10@vs',
         fontSize: '14@vs',
-        marginBottom: '3@vs',
+        fontFamily: 'Roboto-Medium',
+    },
+    // Estilos para el modal
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalView: {
+        width: '90%',
+        maxHeight: '80%',
+        borderRadius: '15@ms',
+        padding: '5@ms',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: '15@s',
+        paddingVertical: '10@vs',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    modalTitle: {
+        fontSize: '18@vs',
+        fontWeight: 'bold',
+    },
+    modalContent: {
+        padding: '15@s',
+        maxHeight: '60%',
+    },
+    resultSection: {
+        marginBottom: '15@vs',
+    },
+    sectionTitle: {
+        fontSize: '16@vs',
+        fontWeight: 'bold',
+        marginBottom: '8@vs',
+    },
+    resultItem: {
+        flexDirection: 'row',
+        marginBottom: '5@vs',
+    },
+    resultLabel: {
+        fontSize: '14@vs',
+        fontWeight: '500',
+        width: '35%',
+    },
+    resultValue: {
+        fontSize: '14@vs',
+        flex: 1,
+    },
+    reputationText: {
+        fontSize: '14@vs',
+        lineHeight: '20@vs',
+    },
+    modalActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingVertical: '15@vs',
+        borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+    },
+    modalButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: '10@vs',
+        paddingHorizontal: '15@s',
+        borderRadius: '8@ms',
+        minWidth: '120@s',
+    },
+    modalButtonText: {
+        color: '#FFFFFF',
+        fontSize: '14@vs',
+        fontWeight: '500',
+        marginLeft: '5@s',
     },
 });
 

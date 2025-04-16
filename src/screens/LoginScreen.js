@@ -71,11 +71,11 @@ const LoginScreen = ({ navigation }) => {
             styles.title,
             { color: currentTheme.text }
           ]}>
-          Login
+          Inicio de Sesión
         </Text>
 
         <InputField
-          label={'Email ID'}
+          label={'Correo electrónico'}
           icon={
             <MaterialIcons
               name="alternate-email"
@@ -97,7 +97,7 @@ const LoginScreen = ({ navigation }) => {
         />
 
         <InputField
-          label={'Password'}
+          label={'Contraseña'}
           icon={
             <Ionicons
               name="lock-closed-outline"
@@ -119,7 +119,7 @@ const LoginScreen = ({ navigation }) => {
         />
 
         <CustomButton 
-          label={"Login"} 
+          label={"Ingresar"} 
           onPress={() => { login(email, password) }}
           // Pass theme colors to CustomButton
           themeColors={{
@@ -130,11 +130,11 @@ const LoginScreen = ({ navigation }) => {
 
         <View style={styles.registerContainer}>
           <Text style={{ color: currentTheme.secondaryText }}>
-            New to the app?
+            Nuevo en la aplicación?
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={[styles.registerText, { color: currentTheme.primary }]}>
-              {' Register'}
+              {' Registro'}
             </Text>
           </TouchableOpacity>
         </View>

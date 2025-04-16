@@ -124,7 +124,7 @@ const OnBoardingScreen = ({ navigation }) => {
             <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
               <Text style={[styles.modalText, { color: currentTheme.secondaryText }]}>
                 <Text style={[styles.bold, { color: currentTheme.boldText }]}>
-                  Última actualización: 20/01/2025
+                  Última actualización: 15/04/2025
                 </Text>{"\n\n"}
                 Bienvenido a PhishGuard. Al utilizar nuestra aplicación, usted acepta cumplir con los siguientes términos y condiciones. Si no está de acuerdo, le solicitamos que no la use.{"\n\n"}
                 

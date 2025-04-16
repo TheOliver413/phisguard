@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
                 setLoading(false);
                 // Mostrar el mensaje de éxito
                 Alert.alert(
-                    'Login exitoso',
+                    'Inicio de Sesión exitoso',
                     `Bienvenido ${userInfo.user.username ? userInfo.user.username : '' }`, // Asegúrate de cambiar el nombre de la propiedad
                     [{ text: 'OK' }]
                 );

@@ -100,11 +100,11 @@ const RegisterScreen = ({ navigation }) => {
                 </View>
 
                 <Text style={[styles.title, { color: currentTheme.text }]}>
-                    Register
+                    Registro
                 </Text>
 
                 <InputField
-                    label={'User Name'}
+                    label={'Nombre de usuario'}
                     value={userName}
                     onChangeText={text => setUserName(text)}
                     icon={
@@ -124,7 +124,7 @@ const RegisterScreen = ({ navigation }) => {
                 />
 
                 <InputField
-                    label={'Email'}
+                    label={'Correo electrónico'}
                     value={email}
                     onChangeText={text => setEmail(text)}
                     icon={
@@ -145,7 +145,7 @@ const RegisterScreen = ({ navigation }) => {
                 />
 
                 <InputField
-                    label={'Password'}
+                    label={'Contraseña'}
                     value={password}
                     onChangeText={text => setPassword(text)}
                     icon={
@@ -176,7 +176,7 @@ const RegisterScreen = ({ navigation }) => {
 
                 <View style={styles.loginContainer}>
                     <Text style={{ color: currentTheme.secondaryText }}>
-                        Already registered?
+                        Ya registrado?
                     </Text>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Text style={[styles.loginText, { color: currentTheme.primary }]}>
